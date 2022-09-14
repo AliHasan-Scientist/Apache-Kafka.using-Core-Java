@@ -14,35 +14,37 @@ public class TestProducer {
 
     public static void main(String[] args) {
 
-        ProducerProperties configs = new ProducerProperties();
-        TopicNames names = new TopicNames();
-        KafkaProducer<String, String> producer = new KafkaProducer<>(configs.setProducerProperties());
-        final ProducerRecord<String, String> record = new ProducerRecord<>(names.ALFA_TOPIC, "Hello");
+        for (int i = 0; i < 30; i++) {
+            ProducerProperties configs = new ProducerProperties();
+            TopicNames names = new TopicNames();
+            KafkaProducer<String, String> producer = new KafkaProducer<>(configs.setProducerProperties());
+            final ProducerRecord<String, String> record = new ProducerRecord<>(names.ALFA_TOPIC, "Hello" + i);
 
-        final Logger logger = LoggerFactory.getLogger(TestProducer.class.getSimpleName());
-        producer.send(record, new Callback() {
+            final Logger logger = LoggerFactory.getLogger(TestProducer.class.getSimpleName());
+            producer.send(record, new Callback() {
 
-            @Override
-            public void onCompletion(RecordMetadata metadata, Exception exception) {
-                if (exception == null) {
-                    logger.info("Topic:" + metadata.topic());
-                    logger.info("No of Partitions:" + metadata.partition());
-                    logger.info("Topic Timestamp:" + metadata.timestamp());
-                    logger.info("Topic Offset:" + metadata.offset());
-                    logger.info("Key of the Topic:" + record.key());
-                    logger.info("Value of the Topic:" + record.value());
+                @Override
+                public void onCompletion(RecordMetadata metadata, Exception exception) {
+                    if (exception == null) {
+                        logger.info("Topic:" + metadata.topic());
+                        logger.info("No of Partitions:" + metadata.partition());
+                        logger.info("Topic Timestamp:" + metadata.timestamp());
+                        logger.info("Topic Offset:" + metadata.offset());
+                        logger.info("Key of the Topic:" + record.key());
+                        logger.info("Value of the Topic:" + record.value());
 
-                } else {
+                    } else {
 
-                    logger.error("%d:", exception.getMessage());
+                        logger.error("%d:", exception.getMessage());
+                    }
+
                 }
 
-            }
+            });
+            producer.flush();
+            producer.close();
 
-        });
-        producer.flush();
-        producer.close();
-
+        }
     }
 
 }
